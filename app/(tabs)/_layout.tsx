@@ -1,45 +1,116 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from 'expo-router'
+import React, { useEffect, useRef } from 'react'
+import { Animated, Easing, Platform } from 'react-native'
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { HapticTab } from '@/components/HapticTab'
+import { IconSymbol } from '@/components/ui/IconSymbol'
+import TabBarBackground from '@/components/ui/TabBarBackground'
+import { Colors } from '@/constants/Colors'
+import { useColorScheme } from '@/hooks/useColorScheme'
+import { SFSymbol } from 'expo-symbols'
+import { useAnimatedStyle, useSharedValue, withRepeat, withSpring } from 'react-native-reanimated'
 
+const RotatedIcon = ({ name, focused }: { name: SFSymbol; focused: boolean }) => {
+    const rotateAnim = useRef(new Animated.Value(0)).current
+
+    useEffect(() => {
+        Animated.timing(rotateAnim, {
+            toValue: focused ? 1 / 6 : 0,
+            duration: 300,
+            easing: Easing.linear,
+            useNativeDriver: true
+        }).start(() => rotateAnim.setValue(0))
+    }, [() => focused])
+
+    const rotateInterpolate = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg']
+    })
+
+    return (
+        <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
+            <IconSymbol
+                name={name}
+                size={28}
+                color={focused ? Colors['askme'] : Colors['offline']}
+            />
+        </Animated.View>
+    )
+}
+
+const BouncedIcon = ({ name, focused }: { name: SFSymbol; focused: boolean }) => {
+    return (
+        <Animated.View>
+            <IconSymbol
+                name={name}
+                size={28}
+                color={focused ? Colors['askme'] : Colors['offline']}
+            />
+        </Animated.View>
+    )
+}
+/*
+const BouncedIcon = ({ name, focused }: { name: SFSymbol; focused: boolean }) => {
+    const translateY = useSharedValue(0)
+    const bouncedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: translateY.value }]
+    }))
+
+    useEffect(() => {
+        translateY.value = withSpring(focused ? 2000 : 0)
+    }, [() => focused])
+
+    return (
+        <Animated.View style={bouncedStyle}>
+            <IconSymbol
+                name={name}
+                size={28}
+                color={focused ? Colors['askme'] : Colors['offline']}
+            />
+        </Animated.View>
+    )
+}
+*/
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme()
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+    return (
+        <Tabs
+            screenOptions={({ route }) => ({
+                tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+                headerShown: false,
+                tabBarIcon: ({ focused }) => {
+                    const name = route.name
+                    switch (name) {
+                        case 'index':
+                            return <BouncedIcon name="person.2" focused={focused} />
+                        case 'settings':
+                            return <RotatedIcon name="gear.circle" focused={focused} />
+                    }
+                },
+                tabBarButton: HapticTab,
+                tabBarBackground: TabBarBackground,
+                tabBarStyle: Platform.select({
+                    ios: {
+                        // Use a transparent background on iOS to show the blur effect
+                        position: 'absolute'
+                    },
+                    default: {}
+                })
+            })}
+        >
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: 'Checklist'
+                }}
+            />
+            <Tabs.Screen
+                name="settings"
+                options={{
+                    title: 'Settings'
+                }}
+            />
+        </Tabs>
+    )
 }
