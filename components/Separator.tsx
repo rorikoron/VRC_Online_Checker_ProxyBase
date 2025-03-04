@@ -17,10 +17,12 @@ export default function Separator({ paddingHorizontal = 0 }: SeparatorProps) {
 const styles = StyleSheet.create({
     separatorContainer: {
         height: 1,
-        width: '100%'
+        width: '100%',
+        transform: 'tranlateY(-50%)'
     },
     separator: {
         height: 1,
-        width: '100%'
+        width: '100%',
+        backgroundColor: '#d2d2d2'
     }
 })

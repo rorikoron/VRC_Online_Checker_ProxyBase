@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router'
+import { Stack, Tabs } from 'expo-router'
 import React, { useEffect, useRef } from 'react'
 import { Animated, Easing, Platform } from 'react-native'
 
@@ -49,68 +49,48 @@ const BouncedIcon = ({ name, focused }: { name: SFSymbol; focused: boolean }) =>
         </Animated.View>
     )
 }
-/*
-const BouncedIcon = ({ name, focused }: { name: SFSymbol; focused: boolean }) => {
-    const translateY = useSharedValue(0)
-    const bouncedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }]
-    }))
-
-    useEffect(() => {
-        translateY.value = withSpring(focused ? 2000 : 0)
-    }, [() => focused])
-
-    return (
-        <Animated.View style={bouncedStyle}>
-            <IconSymbol
-                name={name}
-                size={28}
-                color={focused ? Colors['askme'] : Colors['offline']}
-            />
-        </Animated.View>
-    )
-}
-*/
 export default function TabLayout() {
     const colorScheme = useColorScheme()
 
     return (
-        <Tabs
-            screenOptions={({ route }) => ({
-                tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-                headerShown: false,
-                tabBarIcon: ({ focused }) => {
-                    const name = route.name
-                    switch (name) {
-                        case 'index':
-                            return <BouncedIcon name="person.2" focused={focused} />
-                        case 'settings':
-                            return <RotatedIcon name="gear.circle" focused={focused} />
-                    }
-                },
-                tabBarButton: HapticTab,
-                tabBarBackground: TabBarBackground,
-                tabBarStyle: Platform.select({
-                    ios: {
-                        // Use a transparent background on iOS to show the blur effect
-                        position: 'absolute'
+        <>
+            <Tabs
+                screenOptions={({ route }) => ({
+                    tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+                    headerShown: false,
+                    tabBarIcon: ({ focused }) => {
+                        const name = route.name
+                        switch (name) {
+                            case 'index':
+                                return <BouncedIcon name="person.2" focused={focused} />
+                            case 'settings':
+                                return <RotatedIcon name="gear.circle" focused={focused} />
+                        }
                     },
-                    default: {}
-                })
-            })}
-        >
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: 'Checklist'
-                }}
-            />
-            <Tabs.Screen
-                name="settings"
-                options={{
-                    title: 'Settings'
-                }}
-            />
-        </Tabs>
+                    tabBarButton: HapticTab,
+                    tabBarBackground: TabBarBackground,
+                    tabBarStyle: Platform.select({
+                        ios: {
+                            // Use a transparent background on iOS to show the blur effect
+                            position: 'absolute'
+                        },
+                        default: {}
+                    })
+                })}
+            >
+                <Tabs.Screen
+                    name="index"
+                    options={{
+                        title: 'Checklist'
+                    }}
+                />
+                <Tabs.Screen
+                    name="settings"
+                    options={{
+                        title: 'Settings'
+                    }}
+                />
+            </Tabs>
+        </>
     )
 }
